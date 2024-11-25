@@ -5,7 +5,7 @@ extern crate log;
 
 use anyhow::anyhow;
 use chrono::Local;
-use clap::{Arg, ArgMatches, Command};
+use clap::{ Arg, ArgMatches, Command };
 use clap_complete::Shell;
 use env_logger::Builder;
 use log::LevelFilter;
@@ -28,26 +28,28 @@ fn main() {
     let res = match command.get_matches().subcommand() {
         Some(("init", sub_matches)) => cmd::init::execute(sub_matches),
         Some(("build", sub_matches)) => cmd::build::execute(sub_matches),
+        Some(("tag", sub_matches)) => cmd::tag::execute(sub_matches),
         Some(("clean", sub_matches)) => cmd::clean::execute(sub_matches),
         #[cfg(feature = "watch")]
         Some(("watch", sub_matches)) => cmd::watch::execute(sub_matches),
         #[cfg(feature = "serve")]
         Some(("serve", sub_matches)) => cmd::serve::execute(sub_matches),
         Some(("test", sub_matches)) => cmd::test::execute(sub_matches),
-        Some(("completions", sub_matches)) => (|| {
-            let shell = sub_matches
-                .get_one::<Shell>("shell")
-                .ok_or_else(|| anyhow!("Shell name missing."))?;
+        Some(("completions", sub_matches)) =>
+            (|| {
+                let shell = sub_matches
+                    .get_one::<Shell>("shell")
+                    .ok_or_else(|| anyhow!("Shell name missing."))?;
 
-            let mut complete_app = create_clap_command();
-            clap_complete::generate(
-                *shell,
-                &mut complete_app,
-                "mdbook",
-                &mut std::io::stdout().lock(),
-            );
-            Ok(())
-        })(),
+                let mut complete_app = create_clap_command();
+                clap_complete::generate(
+                    *shell,
+                    &mut complete_app,
+                    "mdbook",
+                    &mut std::io::stdout().lock()
+                );
+                Ok(())
+            })(),
         _ => unreachable!(),
     };
 
@@ -68,10 +70,11 @@ fn create_clap_command() -> Command {
         .arg_required_else_help(true)
         .after_help(
             "For more information about a specific command, try `mdbook <command> --help`\n\
-             The source code for mdBook is available at: https://github.com/rust-lang/mdBook",
+             The source code for mdBook is available at: https://github.com/rust-lang/mdBook"
         )
         .subcommand(cmd::init::make_subcommand())
         .subcommand(cmd::build::make_subcommand())
+        .subcommand(cmd::tag::make_subcommand())
         .subcommand(cmd::test::make_subcommand())
         .subcommand(cmd::clean::make_subcommand())
         .subcommand(
@@ -82,8 +85,8 @@ fn create_clap_command() -> Command {
                         .value_parser(clap::value_parser!(Shell))
                         .help("the shell to generate completions for")
                         .value_name("SHELL")
-                        .required(true),
-                ),
+                        .required(true)
+                )
         );
 
     #[cfg(feature = "watch")]

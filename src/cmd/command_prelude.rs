@@ -1,6 +1,6 @@
 //! Helpers for building the command-line arguments for commands.
 
-pub use clap::{arg, Arg, ArgMatches, Command};
+pub use clap::{ arg, Arg, ArgMatches, Command };
 use std::path::PathBuf;
 
 pub trait CommandExt: Sized {
@@ -17,8 +17,8 @@ pub trait CommandExt: Sized {
                     "Output directory for the book\n\
                     Relative paths are interpreted relative to the book's root directory.\n\
                     If omitted, mdBook uses build.build-dir from book.toml \
-                    or defaults to `./book`.",
-                ),
+                    or defaults to `./book`."
+                )
         )
     }
 
@@ -27,9 +27,9 @@ pub trait CommandExt: Sized {
             Arg::new("dir")
                 .help(
                     "Root directory for the book\n\
-                    (Defaults to the current directory when omitted)",
+                    (Defaults to the current directory when omitted)"
                 )
-                .value_parser(clap::value_parser!(PathBuf)),
+                .value_parser(clap::value_parser!(PathBuf))
         )
     }
 
@@ -45,10 +45,21 @@ pub trait CommandExt: Sized {
                 .long("watcher")
                 .value_parser(["poll", "native"])
                 .default_value("poll")
-                .help("The filesystem watching technique"),
+                .help("The filesystem watching technique")
         );
         #[cfg(not(feature = "watch"))]
         return self;
+    }
+
+    fn arg_tag(self) -> Self {
+        self._arg(
+            Arg::new("tag")
+                .value_parser(clap::value_parser!(String))
+                .help(
+                    "Tag to assign to current docs. \
+                    Ex) 1.2.0-rc of 0.1.1"
+                )
+        )
     }
 }
 

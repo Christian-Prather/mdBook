@@ -3,6 +3,7 @@ title = "mdBook test book"
 description = "A demo book to test and validate changes"
 authors = ["YJDoc2"]
 language = "en"
+version = "1.0.0"
 
 [rust]
 edition = "2018"
