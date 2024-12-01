@@ -96,19 +96,21 @@ impl HtmlHandlebars {
 
         let build_dir = ctx.book_config.src;
         let tags_dir = build_dir.parent().unwrap().join("versions");
-        let entries = fs::read_dir(tags_dir)?;
-        println!("{:?}", entries);
 
-        let file_names: Vec<String> = entries
-        .filter_map(|entry| {
-            let path = entry.ok()?.path();
-            if path.is_file() {
-                path.file_name()?.to_str().map(|s| s.to_owned())
-            } else {
-                None
-            }
-        })
-        .collect();
+
+        // let dirs = fs::read_dir(tags_dir).unwrap();
+
+        // let entries = fs::read_dir(tags_dir).unwrap().count();
+
+        let mut dir_entries = vec![];
+        for dir_entry in fs::read_dir(tags_dir).unwrap() {
+            let dir_entry = dir_entry?;
+            dir_entries.push(dir_entry.path());
+        }
+
+        println!("{:?}", dir_entries);
+
+        
 
         let title = if let Some(title) = ctx.chapter_titles.get(path) {
             title.clone()
@@ -126,7 +128,7 @@ impl HtmlHandlebars {
             "path_to_root".to_owned(),
             json!(utils::fs::path_to_root(path)),
         );
-        ctx.data.insert("tags".to_owned(), json!(file_names));
+        ctx.data.insert("tags".to_owned(), json!(dir_entries));
 
         if let Some(ref section) = ch.number {
             ctx.data
