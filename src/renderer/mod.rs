@@ -67,6 +67,10 @@ pub struct RenderContext {
     /// renderers to cache intermediate results, this directory is not
     /// guaranteed to be empty or even exist.
     pub destination: PathBuf,
+
+    /// tags
+    pub tags: PathBuf,
+
     #[serde(skip)]
     pub(crate) chapter_titles: HashMap<PathBuf, String>,
     #[serde(skip)]
@@ -75,10 +79,11 @@ pub struct RenderContext {
 
 impl RenderContext {
     /// Create a new `RenderContext`.
-    pub fn new<P, Q>(root: P, book: Book, config: Config, destination: Q) -> RenderContext
+    pub fn new<P, Q, V>(root: P, book: Book, config: Config, destination: Q, tags: V) -> RenderContext
     where
         P: Into<PathBuf>,
         Q: Into<PathBuf>,
+        V: Into<PathBuf>
     {
         RenderContext {
             book,
@@ -86,6 +91,7 @@ impl RenderContext {
             version: crate::MDBOOK_VERSION.to_string(),
             root: root.into(),
             destination: destination.into(),
+            tags: tags.into(),
             chapter_titles: HashMap::new(),
             __non_exhaustive: (),
         }
@@ -94,6 +100,11 @@ impl RenderContext {
     /// Get the source directory's (absolute) path on disk.
     pub fn source_dir(&self) -> PathBuf {
         self.root.join(&self.config.book.src)
+    }
+
+    /// tags
+    pub fn tags_dir(&self) -> PathBuf {
+        self.config.book.src.join("versions")
     }
 
     /// Load a `RenderContext` from its JSON representation.

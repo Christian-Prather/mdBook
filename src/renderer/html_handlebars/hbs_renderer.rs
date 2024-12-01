@@ -87,6 +87,29 @@ impl HtmlHandlebars {
             .and_then(serde_json::Value::as_str)
             .unwrap_or("");
 
+
+        // let tag_list = ctx
+        //     .data
+        //     .get("tags")
+        //     .and_then(serde_json::Value::as_str)
+        //     .unwrap_or("");
+
+        let build_dir = ctx.book_config.src;
+        let tags_dir = build_dir.parent().unwrap().join("versions");
+        let entries = fs::read_dir(tags_dir)?;
+        println!("{:?}", entries);
+
+        let file_names: Vec<String> = entries
+        .filter_map(|entry| {
+            let path = entry.ok()?.path();
+            if path.is_file() {
+                path.file_name()?.to_str().map(|s| s.to_owned())
+            } else {
+                None
+            }
+        })
+        .collect();
+
         let title = if let Some(title) = ctx.chapter_titles.get(path) {
             title.clone()
         } else if book_title.is_empty() {
@@ -103,6 +126,8 @@ impl HtmlHandlebars {
             "path_to_root".to_owned(),
             json!(utils::fs::path_to_root(path)),
         );
+        ctx.data.insert("tags".to_owned(), json!(file_names));
+
         if let Some(ref section) = ch.number {
             ctx.data
                 .insert("section".to_owned(), json!(section.to_string()));
@@ -118,7 +143,7 @@ impl HtmlHandlebars {
             &ctx.html_config.code,
             ctx.edition,
         );
-
+ 
         // Write to file
         debug!("Creating {}", filepath.display());
         utils::fs::write_file(&ctx.destination, &filepath, rendered.as_bytes())?;

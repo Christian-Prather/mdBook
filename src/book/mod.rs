@@ -225,12 +225,14 @@ impl MDBook {
 
         let name = renderer.name();
         let build_dir = self.build_dir_for(name);
+        let tags_dir = build_dir.join("versions");
 
         let mut render_context = RenderContext::new(
             self.root.clone(),
             preprocessed_book,
             self.config.clone(),
             build_dir,
+            tags_dir, 
         );
         render_context
             .chapter_titles

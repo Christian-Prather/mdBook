@@ -25,6 +25,7 @@ impl Renderer for MarkdownRenderer {
     fn render(&self, ctx: &RenderContext) -> Result<()> {
         let destination = &ctx.destination;
         let book = &ctx.book;
+        let tags = &ctx.tags;
 
         if destination.exists() {
             utils::fs::remove_dir_content(destination)
